@@ -1,0 +1,22 @@
+{
+  "name": "karma-selenium-launcher",
+  "version": "1.0.0",
+  "description": "A Karma plugin. Run tests on remote instance of Selenium",
+  "main": "index.js",
+  "scripts": {
+    "test": "node ./node_modules/selenium-standalone/bin/selenium-standalone install && node ./node_modules/selenium-standalone/bin/selenium-standalone start"
+  },
+  "dependencies": {
+    "webdriverio": "^4.2.3"
+  },
+  "author": "Mindy Kim",
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-karma": "^2.0.0",
+    "jasmine": "^2.4.1",
+    "karma": "^1.1.2",
+    "karma-jasmine": "^1.0.2",
+    "selenium-standalone": "^5.5.0"
+  }
+}
