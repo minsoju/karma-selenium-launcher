@@ -1,6 +1,6 @@
 {
   "name": "karma-selenium-launcher",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Karma plugin. Run tests on remote instance of Selenium",
   "main": "index.js",
   "scripts": {
@@ -11,6 +11,10 @@
   },
   "author": "Mindy Kim",
   "license": "MIT",
+  "repository" : {
+    "type": "git",
+    "url": "git@github.com:minsoju/karma-selenium-launcher.git"
+  },
   "devDependencies": {
     "grunt": "^1.0.1",
     "grunt-karma": "^2.0.0",
