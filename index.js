@@ -18,7 +18,8 @@ var buildOptions = function(args){
 var SeleniumBrowser = function (baseBrowserDecorator, args, logger) {
   var options = buildOptions(args),
       log = logger.create('webdriverio'),
-      self = this, browserRunning = false;
+      self = this, 
+      browserRunning = false;
 
   baseBrowserDecorator(this);
 
@@ -26,22 +27,27 @@ var SeleniumBrowser = function (baseBrowserDecorator, args, logger) {
 
   this._start = function (url) {
     log.info('Selenium browser started at http://' + options.host+ ':' + options.port + options.path);
-    self.browser = webdriverio.remote(options).init().url(url).then(function(){
-      browserRunning = true;
-    });
-
+    self.browser = webdriverio
+      .remote(options)
+      .init()
+      .url(url)
+      .then(function(){
+        browserRunning = true;
+      });
   };
 
   this.on('kill', function(done){
-    if(browserRunning){
-      self.browser.end().then(function(){
+    if(!browserRunning){
+      process.nextTick(done);
+    }
+
+    self.browser
+      .end()
+      .then(function(){
         log.info('Browser closed');
         self._done();
         done();
       });
-    } else {
-      process.nextTick(done);
-    }
   });
 };
 
