@@ -18,8 +18,7 @@ var buildOptions = function(args){
 var SeleniumBrowser = function (baseBrowserDecorator, args, logger) {
   var options = buildOptions(args),
       log = logger.create('webdriverio'),
-      self = this, 
-      browserRunning = false;
+      self = this;
 
   baseBrowserDecorator(this);
 
@@ -30,14 +29,11 @@ var SeleniumBrowser = function (baseBrowserDecorator, args, logger) {
     self.browser = webdriverio
       .remote(options)
       .init()
-      .url(url)
-      .then(function(){
-        browserRunning = true;
-      });
+      .url(url);
   };
 
   this.on('kill', function(done){
-    if(!browserRunning){
+    if(!self.browser){
       process.nextTick(done);
     }
 
