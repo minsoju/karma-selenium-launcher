@@ -43,6 +43,11 @@ var SeleniumBrowser = function (baseBrowserDecorator, args, logger) {
         log.info('Browser closed');
         self._done();
         done();
+      })
+      .catch(error => {
+        log.error('Browser closed with error:\n' + error.message + '\n' + error.stack);
+        self._done();
+        done();
       });
   });
 };
