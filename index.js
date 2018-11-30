@@ -38,7 +38,9 @@ var SeleniumBrowser = function (baseBrowserDecorator, args, logger) {
     }
 
     self.browser
-      .end()
+      .then(function() {
+        return self.browser.end();
+      })
       .then(function(){
         log.info('Browser closed');
         self._done();
