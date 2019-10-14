@@ -11,7 +11,7 @@
   },
   "author": "Mindy Kim",
   "license": "MIT",
-  "repository" : {
+  "repository": {
     "type": "git",
     "url": "git@github.com:minsoju/karma-selenium-launcher.git"
   },

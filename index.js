@@ -18,7 +18,8 @@ var buildOptions = function(args){
 var SeleniumBrowser = function (baseBrowserDecorator, args, logger) {
   var options = buildOptions(args),
       log = logger.create('webdriverio'),
-      self = this, 
+      self = this,
+      pseudoActivityInterval = null,
       browserRunning = false;
 
   baseBrowserDecorator(this);
@@ -33,6 +34,11 @@ var SeleniumBrowser = function (baseBrowserDecorator, args, logger) {
       .url(url)
       .then(function(){
         browserRunning = true;
+        if (options.pseudoActivityInterval) {
+          pseudoActivityInterval = setInterval(function() {
+            self.browser.title();
+          }, pseudoActivityInterval);
+        }
       });
   };
 
@@ -40,6 +46,8 @@ var SeleniumBrowser = function (baseBrowserDecorator, args, logger) {
     if(!browserRunning){
       process.nextTick(done);
     }
+
+    clearInterval(pseudoActivityInterval);
 
     self.browser
       .end()
