@@ -19,16 +19,18 @@ module.exports = function(config){
     },
     host: 'localhost',
     port: 4444,
-    path: '/wd/hub'
+    path: '/wd/hub',
+    //next is optional
+    pseudoActivityInterval: 10000, // interval in ms to imitate activity
   };
 
   config.set({
     customLaunchers: {
       selenium_chrome: {
-      base: 'Selenium',
-      config: webDriverConfig,
-      name: 'Karma Test',
-      browserName: 'chrome'
+        base: 'Selenium',
+        config: webDriverConfig,
+        name: 'Karma Test',
+        browserName: 'chrome'
       }
     },
     browsers: ['selenium_chrome']
