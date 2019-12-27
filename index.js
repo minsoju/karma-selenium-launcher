@@ -1,56 +1,38 @@
-var webdriverio = require('webdriverio');
+const { remote } = require('webdriverio');
 var env = process.env;
 
-var buildOptions = function(args){
-  var options = args.config, attr;
-
-  for(attr in args){
-    if(!options[attr]){
-    options[attr] = args[attr];
-    }
-  }
-  delete options['config'];
-  delete options['base'];
-
-  return options;
-};
-
 var SeleniumBrowser = function (baseBrowserDecorator, args, logger) {
-  var options = buildOptions(args),
-      log = logger.create('webdriverio'),
+  var log = logger.create('webdriverio'),
       self = this;
 
   baseBrowserDecorator(this);
 
   this.name = 'selenium for ' + args.browserName;
 
-  this._start = function (url) {
-    log.info('Selenium browser started at http://' + options.host+ ':' + options.port + options.path);
-    self.browser = webdriverio
-      .remote(options)
-      .init()
-      .url(url);
+  this._start = function(url) {
+    log.info('Selenium browser started at http://' + args.config.hostname + ':' + args.config.port + args.config.path);
+    remote(args.config).then(browser => {
+      self.browser = browser;
+      browser.url(url);
+    }).catch(e => {
+      log.info('Error retrieving a selenium instance: ', e.message);
+    });
   };
 
-  this.on('kill', function(done){
+  this.on('kill', async function(done){
     if(!self.browser){
       process.nextTick(done);
+      return;
     }
 
-    self.browser
-      .then(function() {
-        return self.browser.end();
-      })
-      .then(function(){
-        log.info('Browser closed');
-        self._done();
-        done();
-      })
-      .catch(error => {
-        log.error('Browser closed with error:\n' + error.message + '\n' + error.stack);
-        self._done();
-        done();
-      });
+    try {
+      await self.browser.deleteSession();
+      log.info('Browser closed');
+    } catch (error) {
+      log.error('Browser closed with error:\n' + error.message + '\n' + error.stack);
+    }
+    self._done();
+    done();
   });
 };
 

@@ -3,10 +3,10 @@ var path = require('path');
 module.exports = function(config) {
 
     var webDriverConfig = {
-      desiredCapabilities: {
+      capabilities: {
         version: '27.0'
       },
-      host: 'localhost',
+      hostname: 'localhost',
       port: 4444,
       path: '/wd/hub'
     };
