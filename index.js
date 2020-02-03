@@ -1,53 +1,52 @@
-var webdriverio = require('webdriverio');
+const { remote } = require('webdriverio');
 var env = process.env;
 
-var buildOptions = function(args){
-  var options = args.config, attr;
-
-  for(attr in args){
-    if(!options[attr]){
-    options[attr] = args[attr];
-    }
-  }
-  delete options['config'];
-  delete options['base'];
-
-  return options;
-};
-
 var SeleniumBrowser = function (baseBrowserDecorator, args, logger) {
-  var options = buildOptions(args),
-      log = logger.create('webdriverio'),
-      self = this, 
-      browserRunning = false;
+  var log = logger.create('webdriverio'),
+      self = this;
 
   baseBrowserDecorator(this);
 
   this.name = 'selenium for ' + args.browserName;
+  this.navigated = false;
 
-  this._start = function (url) {
-    log.info('Selenium browser started at http://' + options.host+ ':' + options.port + options.path);
-    self.browser = webdriverio
-      .remote(options)
-      .init()
-      .url(url)
-      .then(function(){
-        browserRunning = true;
-      });
+  this._start = function(url) {
+    log.info('Selenium browser started at http://' + args.config.hostname + ':' + args.config.port + args.config.path);
+    remote(args.config).then(browser => {
+      self.browser = browser;
+      return browser.url(url);
+    }).then(() => {
+      self.navigated = true;
+      log.info(self.name + ' navigated to the Karma URL');
+    }).catch(e => {
+      self.navigated = true;
+      log.info('Error retrieving a selenium instance: ', e.message);
+    });
   };
 
-  this.on('kill', function(done){
-    if(!browserRunning){
+  this.on('kill', function(done) {
+    if(!self.browser){
       process.nextTick(done);
+      return;
     }
 
-    self.browser
-      .end()
-      .then(function(){
-        log.info('Browser closed');
-        self._done();
-        done();
-      });
+    // need to delay the end request in case the navigation request has not completed yet
+    const delayedEnd = () => {
+      if (self.navigated) {
+        self.browser.deleteSession().then(() => {
+          log.info('Browser closed');
+          self._done();
+          done();
+        }).catch((error) => {
+          log.error('Browser closed with error:\n' + error.message + '\n' + error.stack);
+          self._done();
+          done();
+        });
+      } else {
+        setTimeout(delayedEnd, 100);
+      }
+    };
+    delayedEnd();
   });
 };
 
